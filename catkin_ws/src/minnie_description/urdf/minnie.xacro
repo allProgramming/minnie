@@ -17,7 +17,7 @@
   </link>
 
   <joint name="base_link_joint" type="fixed">
-    <origin xyz="0 0 0.0635" rpy="0 0 0" />
+    <origin xyz="0 0 0.03175" rpy="0 0 0" />
     <parent link="base_footprint"/>
     <child link="base_link" />
   </joint>
@@ -26,13 +26,13 @@
     <visual>
       <origin rpy="0 1.5708 0" />
       <geometry>
-        <cylinder radius="0.0635" length="0.0254" />
+        <cylinder radius="0.03175" length="0.0254" />
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 1.5708 0" />
       <geometry>
-        <cylinder radius="0.0635" length="0.0254" />
+        <cylinder radius="0.03175" length="0.0254" />
       </geometry>
     </collision>
   </link>
@@ -47,13 +47,13 @@
     <visual>
       <origin rpy="0 1.5708 0" />
       <geometry>
-        <cylinder radius="0.0635" length="0.0254" />
+        <cylinder radius="0.03175" length="0.0254" />
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 1.5708 0" />
       <geometry>
-        <cylinder radius="0.0635" length="0.0254" />
+        <cylinder radius="0.03175" length="0.0254" />
       </geometry>
     </collision>
   </link>

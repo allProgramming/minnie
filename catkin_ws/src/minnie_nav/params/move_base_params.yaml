@@ -1,0 +1,4 @@
+base_local_planner: "dwa_local_planner/DWAPlannerROS"
+base_global_planner: "global_planner/GlobalPlanner"
+recovery_behavior_enabled: false
+

@@ -1,0 +1,6 @@
+DWAPlannerROS:
+  max_vel_y: 0
+  min_vel_y: 0
+  acc_limit_y: 0
+  vy_samples: 1
+
