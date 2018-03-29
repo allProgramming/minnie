@@ -11,6 +11,7 @@ rosrun rosserial_python serial_node.py /dev/ttyS0 _baud:=115200
 roslaunch minnie_control minnie_hardware.launch
 roslaunch minnie_control minnie_visualize.launch
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+<<<<<<< HEAD
 ```
 
 (At some point, the above will be replaced by roslaunch minnie_bringup)
