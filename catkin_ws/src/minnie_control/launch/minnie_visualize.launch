@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Load example URDF -->
+  <param
+    name="robot_description"
+    command="$(find xacro)/xacro.py '$(find minnie_description)/urdf/minnie.xacro' --inorder"
+  />
+
+  <!-- Show in Rviz  -->
+  <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(find minnie_description)/launch/minnie.rviz"
+  />
+
+</launch>
+
