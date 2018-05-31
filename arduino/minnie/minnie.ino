@@ -3,19 +3,27 @@
  */
 
 #include <ros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/Float32.h>
+#include <Servo.h>
+#include <NewPing.h>
+#include <Wire.h>  // For LSM303 I2C comms
+#include <LSM303.h>
+#include <PID_v1.h>
+
+#include <minnie_serial/ToRobot.h>
+#include <minnie_serial/FromRobot.h>
 
 
-const int TICKS_PER_REV = 20;
+#define TRIGGER_PIN  11
+#define ECHO_PIN     12
+#define MAX_DISTANCE 450
 
+const int TICKS_PER_REV = 40;
 
 ros::NodeHandle  nh;
 
 
-std_msgs::Float32 odom_msg;
-ros::Publisher odom_left_pub("odom_left_pos", &odom_msg);
-ros::Publisher odom_right_pub("odom_right_pos", &odom_msg);
+minnie_serial::FromRobot odom_msg;
+ros::Publisher odom_pub("odom_pos", &odom_msg);
 
 int LMotorSpeedPin = 5;            // Left Motor Speed pin (ENA)
 int LMotorForward = A0;            // Motor-L forward (IN1)
@@ -31,6 +39,19 @@ int countL=0, countR=0;
 
 int dirL = 0;
 int dirR = 0;
+
+Servo myservo;
+int servoPos = 90;
+int servoDir = 1;
+
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+
+LSM303 compass;
+
+double SetpointL,InputL,OutputL;
+double SetpointR,InputR,OutputR;
+PID PIDL(&InputL,&OutputL,&SetpointL,25,8,0,DIRECT);
+PID PIDR(&InputR,&OutputR,&SetpointR,25,8,0,DIRECT);
 
 void countLeft()
 {
@@ -85,7 +106,10 @@ int speedFromRadPerSec(float rad_per_sec) {
   if (isNeg) {
     rad_per_sec = -rad_per_sec;
   }
-  int s = (int)(125 + (rad_per_sec - 5.544) / (47.124 - 5.544) * (250 - 125));
+  if (rad_per_sec < 4.0) {
+    rad_per_sec = 4.0;
+  }
+  int s = (int)(150 / 4 * 3 + (rad_per_sec - 3.942) / (6.51 - 3.942) * (254 - 150) * 0.15);// * 1.75);
   if (s < 0) {
     s = 0;
   }
@@ -98,16 +122,12 @@ int speedFromRadPerSec(float rad_per_sec) {
   return s;
 }
 
-void leftMessageCb(const std_msgs::Float32& rad_per_sec){
-  driveLeft(speedFromRadPerSec(rad_per_sec.data));
+void messageCb(const minnie_serial::ToRobot& msg){
+  driveLeft(speedFromRadPerSec(msg.l));
+  driveRight(speedFromRadPerSec(msg.r));
 }
 
-void rightMessageCb(const std_msgs::Float32& rad_per_sec){
-  driveRight(speedFromRadPerSec(rad_per_sec.data));
-}
-
-ros::Subscriber<std_msgs::Float32> subL("left_wheel_vel", leftMessageCb );
-ros::Subscriber<std_msgs::Float32> subR("right_wheel_vel", rightMessageCb );
+ros::Subscriber<minnie_serial::ToRobot> sub("wheel_vel", messageCb);
 
 void setup()
 {
@@ -120,12 +140,25 @@ void setup()
   pinMode(RMotorForward, OUTPUT);
   pinMode(RMotorBackward, OUTPUT);
 
+  Wire.begin();
+  compass.init();
+  compass.enableDefault();
+  compass.m_min = (LSM303::vector<int16_t>){-3330, -2524, -3104};
+  compass.m_max = (LSM303::vector<int16_t>){+2778, +3065, +1727};
+
+  myservo.attach(9);
+
+  InputL = 0;
+  SetpointL = 10;
+  InputR = 0;
+  SetpointR = 10;
+  PIDL.SetMode(AUTOMATIC);
+  PIDR.SetMode(AUTOMATIC);
+
   nh.getHardware()->setBaud(115200);
   nh.initNode();
-  nh.advertise(odom_left_pub);
-  nh.advertise(odom_right_pub);
-  nh.subscribe(subL);
-  nh.subscribe(subR);
+  nh.advertise(odom_pub);
+  nh.subscribe(sub);
 }
 
 float radiansFromTicks(int count) {
@@ -134,10 +167,22 @@ float radiansFromTicks(int count) {
 
 void loop()
 {
-  odom_msg.data = radiansFromTicks(countL);
-  odom_left_pub.publish( &odom_msg );
-  odom_msg.data = radiansFromTicks(countR);
-  odom_right_pub.publish( &odom_msg );
+  PIDL.Compute();
+  PIDR.Compute();
+  servoPos += servoDir;
+  if (servoPos > 165 || servoPos < 15) {
+    servoDir *= -1;
+    servoPos += servoDir * 2;
+  }
+  myservo.write(servoPos);
+  odom_msg.servo = myservo.read();
+  int cm = sonar.ping_cm();
+  odom_msg.dist = cm;
+  odom_msg.l = radiansFromTicks(countL);
+  odom_msg.r = radiansFromTicks(countR);
+  compass.read();
+  odom_msg.heading = compass.heading();
+  odom_pub.publish(&odom_msg);
   nh.spinOnce();
   delay(100);
 }

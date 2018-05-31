@@ -42,7 +42,8 @@
 
 #include <ros_control_boilerplate/generic_hw_interface.h>
 
-#include "std_msgs/Float32.h"
+#include "minnie_serial/ToRobot.h"
+#include "minnie_serial/FromRobot.h"
 
 namespace minnie_control
 {
@@ -67,13 +68,10 @@ public:
   virtual void enforceLimits(ros::Duration &period);
 
 private:
-  void leftOdomCb(const std_msgs::Float32 &msg);
-  void rightOdomCb(const std_msgs::Float32 &msg);
+  void odomCb(const minnie_serial::FromRobot &msg);
 
-  ros::Publisher leftWheelPub;
-  ros::Publisher rightWheelPub;
-  ros::Subscriber leftOdomSub;
-  ros::Subscriber rightOdomSub;
+  ros::Publisher wheelPub;
+  ros::Subscriber odomSub;
 
   float leftOdom, rightOdom;
 

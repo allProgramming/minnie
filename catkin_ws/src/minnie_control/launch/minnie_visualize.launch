@@ -12,7 +12,8 @@
     name="rviz"
     pkg="rviz"
     type="rviz"
-    args="-d $(find minnie_description)/launch/minnie.rviz"
+    args="-d $(find minnie_description)/rviz/primary.rviz"
+    required="true"
   />
 
 </launch>

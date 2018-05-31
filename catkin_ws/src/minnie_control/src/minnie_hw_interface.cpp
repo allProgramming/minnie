@@ -39,7 +39,8 @@
 
 #include <minnie_control/minnie_hw_interface.h>
 
-#include "std_msgs/Float32.h"
+#include "minnie_serial/ToRobot.h"
+#include "minnie_serial/FromRobot.h"
 
 namespace minnie_control
 {
@@ -47,19 +48,14 @@ namespace minnie_control
 MinnieHWInterface::MinnieHWInterface(ros::NodeHandle &nh, urdf::Model *urdf_model)
   : ros_control_boilerplate::GenericHWInterface(nh, urdf_model), leftOdom(0), rightOdom(0)
 {
-  leftWheelPub = nh.advertise<std_msgs::Float32>("/left_wheel_vel", 10);
-  rightWheelPub = nh.advertise<std_msgs::Float32>("/right_wheel_vel", 10);
-  leftOdomSub = nh.subscribe("/odom_left_pos", 10, &MinnieHWInterface::leftOdomCb, this);
-  rightOdomSub = nh.subscribe("/odom_right_pos", 10, &MinnieHWInterface::rightOdomCb, this);
+  wheelPub = nh.advertise<minnie_serial::ToRobot>("/wheel_vel", 10);
+  odomSub = nh.subscribe("/odom_pos", 10, &MinnieHWInterface::odomCb, this);
   ROS_INFO_NAMED("minnie_hw_interface", "MinnieHWInterface Ready.");
 }
 
-void MinnieHWInterface::leftOdomCb(const std_msgs::Float32 &msg) {
-  leftOdom = msg.data;
-}
-
-void MinnieHWInterface::rightOdomCb(const std_msgs::Float32 &msg) {
-  rightOdom = msg.data;
+void MinnieHWInterface::odomCb(const minnie_serial::FromRobot &msg) {
+  leftOdom = msg.l;
+  rightOdom = msg.r;
 }
 
 void MinnieHWInterface::read(ros::Duration &elapsed_time)
@@ -78,11 +74,10 @@ void MinnieHWInterface::write(ros::Duration &elapsed_time)
   // ----------------------------------------------------
   //
   // FILL IN YOUR WRITE COMMAND TO USB/ETHERNET/ETHERCAT/SERIAL ETC HERE
-  std_msgs::Float32 msg;
-  msg.data = joint_velocity_command_[0];
-  leftWheelPub.publish(msg);
-  msg.data = joint_velocity_command_[1];
-  rightWheelPub.publish(msg);
+  minnie_serial::ToRobot msg;
+  msg.l = joint_velocity_command_[0];
+  msg.r = joint_velocity_command_[1];
+  wheelPub.publish(msg);
   //
   // FOR A EASY SIMULATION EXAMPLE, OR FOR CODE TO CALCULATE
   // VELOCITY FROM POSITION WITH SMOOTHING, SEE
