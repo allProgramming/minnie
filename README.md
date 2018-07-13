@@ -1,7 +1,4 @@
 # Minnie
-Assembly instructions and software for a minimalistic, economical 2-wheeled robot.
-
----
 
 The goal of this project is to lower the barrier-of-entry for aspiring hobby-roboticists. This is done by providing simple purchasing and assembly instructions, on a tight budget, as well as software to operate and customize the robot.
 
