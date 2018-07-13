@@ -1,0 +1,17 @@
+<launch>
+  <include file="$(find minnie_control)/launch/minnie_simulation.launch" />
+  <include file="$(find minnie_control)/launch/minnie_visualize.launch" />
+  <node
+    name="minnie_localization"
+    pkg="fake_localization"
+    type="fake_localization">
+    <remap from="base_pose_ground_truth" to="odom" />
+    <param name="base_frame_id" value="base_footprint" />
+  </node>
+  <!-- node
+    name="minnie_teleop"
+    pkg="teleop_twist_keyboard"
+    type="teleop_twist_keyboard.py"
+    output="screen" / -->
+  <include file="$(find minnie_nav)/launch/full.launch" />
+</launch>

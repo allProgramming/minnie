@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<robot name="minnie" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="base_footprint" />
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.2032 0.13335 0.01" />
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.2032 0.13335 0.01" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="0 0 0.03175" rpy="0 0 0" />
+    <parent link="base_footprint"/>
+    <child link="base_link" />
+  </joint>
+
+  <link name="wheel_left_link">
+    <visual>
+      <origin rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder radius="0.03175" length="0.0254" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder radius="0.03175" length="0.0254" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="wheel_left_joint" type="continuous">
+    <origin xyz="0.04445 0.0667 0" rpy="0 0 1.5708" />
+    <parent link="base_link"/>
+    <child link="wheel_left_link" />
+  </joint>
+
+  <link name="wheel_right_link">
+    <visual>
+      <origin rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder radius="0.03175" length="0.0254" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder radius="0.03175" length="0.0254" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="wheel_right_joint" type="continuous">
+    <origin xyz="0.04445 -0.0667 0" rpy="0 0 1.5708" />
+    <parent link="base_link"/>
+    <child link="wheel_right_link" />
+  </joint>
+
+</robot>
+

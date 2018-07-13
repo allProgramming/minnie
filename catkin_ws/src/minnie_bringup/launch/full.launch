@@ -1,0 +1,23 @@
+<launch>
+  <arg name="sim" default="false"/>
+  <node
+    if="$(eval not sim)"
+    name="minnie_serial"
+    pkg="rosserial_python"
+    type="serial_node.py"
+    args="/dev/ttyS0"
+    output="screen">
+    <param name="baud" value="115200" />
+  </node>
+  <include if="$(eval sim)" file="$(find minnie_control)/launch/minnie_simulation.launch" />
+  <include if="$(eval not sim)" file="$(find minnie_control)/launch/minnie_hardware.launch" />
+  <include file="$(find minnie_control)/launch/minnie_visualize.launch" />
+  <node
+    name="minnie_localization"
+    pkg="fake_localization"
+    type="fake_localization">
+    <remap from="base_pose_ground_truth" to="odom" />
+    <param name="base_frame_id" value="base_footprint" />
+  </node>
+  <include file="$(find minnie_nav)/launch/full.launch" />
+</launch>
