@@ -1,19 +1,18 @@
 # Minnie
-Assembly instructions and software for a minimalistic, economical robot.
+Assembly instructions and software for a minimalistic, economical 2-wheeled robot.
 
 ---
 
-After following setup instructions (to be provided), execute each of the following instructions in its own terinal tab...
+The goal of this project is to lower the barrier-of-entry for aspiring hobby-roboticists. This is done by providing simple purchasing and assembly instructions, on a tight budget, as well as software to operate and customize the robot.
+
+Minnie is a small, 2-wheeled driving robot (Currently based on the AlphaBot). Begin by following the ["Getting Started"](https://github.com/allProgramming/minnie/wiki/Getting-Started) instructions. Then, execute each of the following instructions in its own terinal tab...
 
 ```
-roscore
-rosrun rosserial_python serial_node.py /dev/ttyS0 _baud:=115200
-roslaunch minnie_control minnie_hardware.launch
-roslaunch minnie_control minnie_visualize.launch
+roslaunch minnie_bringup full.launch
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 
-(At some point, the above will be replaced by roslaunch minnie_bringup)
+NOTE: Instructions and software/code are currently under heavy development, and can change at any time.
 
 ---
 
